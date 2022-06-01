@@ -10,8 +10,8 @@ class cost:
         self.tt=np.linspace(0,1,100)
         
     def get_cost(self,sol1):
-        self.x=sol1.x 
-        self.y=sol1.y 
+        self.x=sol1['x'] 
+        self.y=sol1['y'] 
         self.k=self.x.size + 2
         self.TS=np.linspace(0,1,self.k)
         self.XS=np.insert(self.x,[0,self.x.size],[self.m.xs,self.m.xt])
@@ -43,7 +43,7 @@ class cost:
         
         
         self.z=self.L*(1+self.beta*self.violation)
-        return self.z
+        return self.z, self.feasible
         
 
             
