@@ -32,12 +32,18 @@ class cost:
         for i in range(nobs):
             d=np.sqrt(np.square(self.xx-self.m.xobs[i])+np.square(self.yy-self.m.yobs[i]))
             temp=1-(d/(self.m.robs[i]))
+
+            v=np.maximum(temp,np.zeros(1))
+            self.violation+=np.mean(v)
             
-            v=temp[np.argmax(temp)]
-            if v == 1:
-                self.feasible=0
-                self.violation+=1
-            
+            # v=temp[np.argmax(temp)]
+            # if v == 1:
+            #     self.feasible=0
+            #     self.violation+=1
+        if self.violation==0:
+            self.feasible=1
+        else:
+            self.feasible=0   
             
         
         

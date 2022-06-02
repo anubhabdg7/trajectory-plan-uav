@@ -17,7 +17,7 @@ class bees_algo:
         self.stlim=5
         self.accuracy=0.001
         self.P=1
-        self.max_it=1
+        self.max_it=1000
         self.optcost=np.zeros(self.max_it)
         self.counter_sup=np.zeros(self.max_it)
     
@@ -31,14 +31,14 @@ class bees_algo:
          
 
         self.empty_patch={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
-                          'cost':float(0.00),
+                          'cost':np.inf,
                           #'sol': 0,
                           'size': np.zeros(2),
                           'stagnated': 0,
                           'counter': 0}
         self.counter=0
-        counter=0
-        self.patch=[self.empty_patch for i in range(self.n)]
+        # counter=0
+        self.patch=[self.empty_patch.copy() for i in range(self.n)]
 
         for i in range(self.n):
             if i>0:
@@ -50,41 +50,44 @@ class bees_algo:
                 self.patch[i]['position']['x']=xx[1:self.nodes-1]
                 self.patch[i]['position']['y']=yy[1:self.nodes-1]
             # print(i)
-            self.patch[i]['cost'],f = i,i #self.cost.get_cost(self.patch[i]['position'])
+            self.patch[i]['cost'],f = self.cost.get_cost(self.patch[i]['position'])
             # print(self.patch[i]['cost'])
+            # new=i-1
+            # print(self.patch[new]['cost'])
             self.patch[i]['size']=np.array([((self.m.xmax-self.m.xmin)/4.00),((self.m.ymax-self.m.ymin)/4.00)])
             self.patch[i]['stagnated']=0.00
-            counter+=1
-            self.patch[i]['counter']=counter
+            self.counter+=1
+            self.patch[i]['counter']=self.counter
             
             # print(self.patch[i]['cost'])
         # self.size=np.linspace(0,1,self.n)
-        for i in range(self.n):
-            print(self.patch[i]['cost'])
-        # self.patch=self.site_selection(self.patch)
+        # for i in range(self.n):
+        #     print(self.patch[i]['cost'])
+        self.patch=self.site_selection(self.patch)
         # for i in range(self.n):
         #     print(self.patch[i]['cost'])
 
     def site_selection(self,patch):
 
-        patch=sorted(patch, key=lambda d: d['cost'], reverse=1)
+        patch=sorted(patch, key=lambda d: d['cost'], reverse=0)
         return patch 
         
 
 
     def search(self):
+        best=np.inf 
         for it in range(self.max_it):
 
             if self.counter>=self.max_eval:
                 break
             self.bestnewbee={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
-                            'cost':float(0.00),
+                            'cost':np.inf,
                             #'sol': 0,
                             'size': np.zeros(2),
                             'stagnated': 0,
                             'counter': 0}
             self.foragerbees={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
-                            'cost':float(0.00),
+                            'cost':np.inf,
                             #'sol': 0,
                             'size': np.zeros(2),
                             'stagnated': 0,
@@ -124,14 +127,21 @@ class bees_algo:
                     self.P*=-1
 
             self.patch=self.site_selection(self.patch)
-            self.optsol=self.patch[0]
-            self.optcost[it]=self.optsol['cost']
+            # if it==0:
+
+            #     self.optsol=self.patch[0]
+            # else:
+                
+            self.optcost[it]=self.patch[0]['cost']
+            if self.optcost[it]<best:
+                best=self.optcost[it]
+                self.optsol=self.patch[0]
             opt_cost=np.zeros(self.max_it+1)
             opt_cost[0]=np.inf 
             opt_cost[it+1]=self.optcost[it]
             self.counter_sup[it]=self.counter
-            print(self.optsol['cost'])
-        return self.optsol 
+            print(self.optcost[it])
+        return self.optsol,self.optcost 
             
             
             
@@ -151,7 +161,7 @@ class bees_algo:
         return M 
 
     def d_tri_real(self,k,t,b):
-        m=np.random.randint(1,10)
+        m=np.random.randint(1,11)
         a=(t-k)/10
         b=(b-t)/10
 
@@ -184,7 +194,8 @@ class bees_algo:
         r=ass*size 
         # print(r)
         nvar=x.size 
-        pert=np.random.randint(0,1,(1,nvar))
+        pert=np.random.randint(0,2,(1,nvar))
+        # print(pert)
         y=x
         # print("Hello")
         # print((np.random.uniform(-1*r,r,1)[0]))
@@ -200,10 +211,15 @@ class bees_algo:
     def integrated_foraging_stlim(self,x,ass,vmx,vmn,size):
         r=ass*size 
         nvar=x.size 
-        k=np.random.randint(1,nvar)
+        k=np.random.randint(0,nvar)
         y=x 
         
-        y[k]=y[k]+r*(math.pow(-1,np.random.randint(1,2)))
+        y[k]=y[k]+r*(math.pow(-1,np.random.randint(1,3)))
+
+        # if y[k]>vmx:
+        #     y[k]=vmx 
+        # if y[k]<vmn:
+        #     y[k]=vmn 
         
         for i in range(y.size):
             if y[i]>vmx:

@@ -3,14 +3,15 @@ import matplotlib.pyplot as plt
 import math as m 
 from bees_algo import bees_algo as ba 
 from uav import model as m 
+from scipy.interpolate import interp1d
 
 m=m()
 ba=ba()
 
 ba.init()
 # print(np.random.uniform(-1,1,1))
-sol=ba.search()
-print(sol['position']['x'])
+sol,cost=ba.search()
+# print(sol['position']['x'])
 fig,axes=plt.subplots()
 axes.set_xlim([0,100])
 axes.set_ylim([0,100])
@@ -29,9 +30,17 @@ axes.add_patch(c4)
 axes.add_patch(c5)
 axes.plot(m.xs,m.ys,'go')
 axes.plot(m.xt,m.yt,'bo')
+
+# f = interp1d(sol['position']['x'], sol['position']['y'], kind='cubic')
+# y_smooth=f(sol['position']['x'])
+# plt.plot(sol['position']['x'],y_smooth)
+
 for i in range(10):
     axes.plot(sol['position']['x'][i],sol['position']['y'][i],'ro')
 
+plt.show()
+
+plt.plot(cost)
 plt.show()
 
 
