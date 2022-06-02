@@ -17,7 +17,7 @@ class bees_algo:
         self.stlim=5
         self.accuracy=0.001
         self.P=1
-        self.max_it=50
+        self.max_it=1
         self.optcost=np.zeros(self.max_it)
         self.counter_sup=np.zeros(self.max_it)
     
@@ -37,6 +37,7 @@ class bees_algo:
                           'stagnated': 0,
                           'counter': 0}
         self.counter=0
+        counter=0
         self.patch=[self.empty_patch for i in range(self.n)]
 
         for i in range(self.n):
@@ -48,18 +49,25 @@ class bees_algo:
                 yy=np.linspace(self.m.ys,self.m.yt,self.nodes)
                 self.patch[i]['position']['x']=xx[1:self.nodes-1]
                 self.patch[i]['position']['y']=yy[1:self.nodes-1]
-            
-            self.patch[i]['cost'],~=self.cost.get_cost(self.patch[i]['position'])
+            # print(i)
+            self.patch[i]['cost'],f = i,i #self.cost.get_cost(self.patch[i]['position'])
+            # print(self.patch[i]['cost'])
             self.patch[i]['size']=np.array([((self.m.xmax-self.m.xmin)/4.00),((self.m.ymax-self.m.ymin)/4.00)])
             self.patch[i]['stagnated']=0.00
             counter+=1
             self.patch[i]['counter']=counter
-        self.size=np.linspace(0,1,self.n)
-        self.patch=self.site_selection(self.patch)
+            
+            # print(self.patch[i]['cost'])
+        # self.size=np.linspace(0,1,self.n)
+        for i in range(self.n):
+            print(self.patch[i]['cost'])
+        # self.patch=self.site_selection(self.patch)
+        # for i in range(self.n):
+        #     print(self.patch[i]['cost'])
 
     def site_selection(self,patch):
 
-        patch=sorted(patch, key=lambda d: d['cost'])
+        patch=sorted(patch, key=lambda d: d['cost'], reverse=1)
         return patch 
         
 
@@ -84,17 +92,18 @@ class bees_algo:
             
             for i in range(self.n):
                 self.bestnewbee['cost']=np.inf
-                self.assignment=self.d_tri_real_array(0,(i+1),1,1,self.recruitment[i])
+                self.assignment=self.d_tri_real_array(0,(i+1),1,1,self.recruitment[i])[0]
+                # print(self.assignment)
 
-                for j in range(self.recruitment[i]):
+                for j in range(int(self.recruitment[i])):
                     if self.P==1:
                         self.foragerbees['position']['x']=self.integrated_foraging_stlim_all(self.patch[i]['position']['x'],self.assignment[j],self.m.xmax,self.m.xmin,self.patch[i]['size'][0])
                         self.foragerbees['position']['y']=self.integrated_foraging_stlim_all(self.patch[i]['position']['y'],self.assignment[j],self.m.ymax,self.m.ymin,self.patch[i]['size'][1])                    
                     else:
                         self.foragerbees['position']['x']=self.integrated_foraging_stlim(self.patch[i]['position']['x'],self.assignment[j],self.m.xmax,self.m.xmin,self.patch[i]['size'][0])
                         self.foragerbees['position']['y']=self.integrated_foraging_stlim(self.patch[i]['position']['y'],self.assignment[j],self.m.ymax,self.m.ymin,self.patch[i]['size'][1])
-
-                    self.foragerbees['cost'],~=self.cost.get_cost(self.foragerbees['position']) 
+                    # print(self.foragerbees['position']['x'])
+                    self.foragerbees['cost'],f = self.cost.get_cost(self.foragerbees['position']) 
                     self.foragerbees['size']=self.patch[i]['size']
                     self.foragerbees['stagnated']=self.patch[i]['stagnated']
                     self.counter+=1
@@ -121,6 +130,7 @@ class bees_algo:
             opt_cost[0]=np.inf 
             opt_cost[it+1]=self.optcost[it]
             self.counter_sup[it]=self.counter
+            print(self.optsol['cost'])
         return self.optsol 
             
             
@@ -133,10 +143,11 @@ class bees_algo:
         
 
     def d_tri_real_array(self,k,t,b,baris,kolom):
-        M=np.zeros(baris,kolom)
-        for i in range(baris):
-            for j in range(kolom):
-                M[i][j]=self.d_tri_real(k,t,b)
+        M=np.zeros((int(baris),int(kolom)))
+        for i in range(int(baris)):
+            for j in range(int(kolom)):
+                # print(self.d_tri_real(k,t,b)[0])
+                M[i][j]=(self.d_tri_real(k,t,b)[0])
         return M 
 
     def d_tri_real(self,k,t,b):
@@ -169,26 +180,38 @@ class bees_algo:
 
 
     def integrated_foraging_stlim_all(self,x,ass,vmx,vmn,size):
+        
         r=ass*size 
+        # print(r)
         nvar=x.size 
         pert=np.random.randint(0,1,(1,nvar))
         y=x
-        y+=np.random.uniform(-r,r,1)*pert 
-        if y>vmx:
-            y=vmx 
-        if y<vmn:
-            y=vmn 
+        # print("Hello")
+        # print((np.random.uniform(-1*r,r,1)[0]))
+        y=y+(np.random.uniform(-1*r,r,1)[0])*pert 
+        y=y[0]
+        for i in range(y.size):
+            if y[i]>vmx:
+                y[i]=vmx 
+            if y[i]<vmn:
+                y[i]=vmn 
+        return y 
     
     def integrated_foraging_stlim(self,x,ass,vmx,vmn,size):
         r=ass*size 
         nvar=x.size 
         k=np.random.randint(1,nvar)
         y=x 
-        y[k]+=r*(math.pow(-1,np.random.randint(1,2)))
-        if y>vmx:
-            y=vmx 
-        if y<vmn:
-            y=vmn 
+        
+        y[k]=y[k]+r*(math.pow(-1,np.random.randint(1,2)))
+        
+        for i in range(y.size):
+            if y[i]>vmx:
+                y[i]=vmx 
+            if y[i]<vmn:
+                y[i]=vmn
+        
+        return y 
     
 
 
