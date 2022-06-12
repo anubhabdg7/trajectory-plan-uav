@@ -11,7 +11,7 @@ class bees_algo:
         self.m=model()
         self.cost=cost()
         self.max_eval=500000
-        self.n=7
+        self.n=10
         self.nep=10
         self.shrink=0.8
         self.stlim=5
@@ -76,10 +76,12 @@ class bees_algo:
 
     def search(self):
         best=np.inf 
-        for it in range(self.max_it):
+        it=0
+        opt_cost=np.zeros(self.max_it)
+        while(it<self.max_it):
 
-            if self.counter>=self.max_eval:
-                break
+            # if self.counter>=self.max_eval:
+            #     break
             self.bestnewbee={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
                             'cost':np.inf,
                             #'sol': 0,
@@ -132,16 +134,27 @@ class bees_algo:
             #     self.optsol=self.patch[0]
             # else:
                 
-            self.optcost[it]=self.patch[0]['cost']
-            if self.optcost[it]<best:
-                best=self.optcost[it]
+            tmp=self.patch[0]['cost']
+            if tmp<best:
+                best=tmp 
                 self.optsol=self.patch[0]
-            opt_cost=np.zeros(self.max_it+1)
-            opt_cost[0]=np.inf 
-            opt_cost[it+1]=self.optcost[it]
-            self.counter_sup[it]=self.counter
-            print(self.optcost[it])
-        return self.optsol,self.optcost 
+            opt_cost[it]=tmp 
+            # opt_cost=np.zeros(self.max_it+1)
+            # opt_cost[0]=np.inf 
+            # opt_cost[it+1]=self.optcost[it]
+            # self.counter_sup[it]=self.counter
+            print(tmp)
+            # f1=open("savex.txt","a")
+            # f1.write(str(self.optsol['position']['x'])+'\n')
+            # f1.close()
+            # f2=open("savey.txt","a")
+            # f2.write(str(self.optsol['position']['y'])+'\n')
+            # f2.close()
+            # f3=open("savec.txt","a")
+            # f3.write(str(best)+'\n')
+            # f3.close()
+            it+=1
+        return self.optsol,opt_cost 
             
             
             
