@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from uav import model as model 
 from cost import cost as cost 
 import math as math 
+import streamlit as st 
+
 
 
 class bees_algo:
@@ -11,21 +13,25 @@ class bees_algo:
         self.m=model()
         self.cost=cost()
         self.max_eval=500000
-        self.n=10
+        self.n=7
         self.nep=10
         self.shrink=0.8
         self.stlim=5
         self.accuracy=0.001
         self.P=1
-        self.max_it=1000
+        self.max_it=50
         self.optcost=np.zeros(self.max_it)
         self.counter_sup=np.zeros(self.max_it)
+        # np.random.seed(200000)
     
     def init(self):
 
         ### Intitialization and site selection ###
 
         self.recruitment=np.round(np.linspace(self.nep,1,self.n))
+        # self.recruitment=np.round(np.linspace(1,self.nep,self.n))
+        # print(self.recruitment)
+
         self.assignment=np.linspace(0,1,self.n)
         self.colony_size=np.sum(self.recruitment)
          
@@ -69,7 +75,7 @@ class bees_algo:
 
     def site_selection(self,patch):
 
-        patch=sorted(patch, key=lambda d: d['cost'], reverse=0)
+        patch=sorted(patch, key=lambda d: d['cost'])
         return patch 
         
 
@@ -78,26 +84,48 @@ class bees_algo:
         best=np.inf 
         it=0
         opt_cost=np.zeros(self.max_it)
-        while(it<self.max_it):
+        self.bestnewbee={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
+                            'cost':np.inf,
+                            #'sol': 0,
+                            'size': np.zeros(2),
+                            'stagnated': 0,
+                            'counter': 0}
+        self.foragerbees={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
+                            'cost':np.inf,
+                            #'sol': 0,
+                            'size': np.zeros(2),
+                            'stagnated': 0,
+                            'counter': 0}
+        while(True):
+            # np.random.seed(it)
 
             # if self.counter>=self.max_eval:
             #     break
-            self.bestnewbee={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
-                            'cost':np.inf,
-                            #'sol': 0,
-                            'size': np.zeros(2),
-                            'stagnated': 0,
-                            'counter': 0}
-            self.foragerbees={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
-                            'cost':np.inf,
-                            #'sol': 0,
-                            'size': np.zeros(2),
-                            'stagnated': 0,
-                            'counter': 0}
+            
             
             for i in range(self.n):
-                self.bestnewbee['cost']=np.inf
-                self.assignment=self.d_tri_real_array(0,(i+1),1,1,self.recruitment[i])[0]
+                # self.bestnewbee['cost']=self.patch[i]['cost']
+                self.bestnewbee['cost']=np.inf 
+                # self.bestnewbee={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
+                #             'cost':np.inf,
+                #             #'sol': 0,
+                #             'size': np.zeros(2),
+                #             'stagnated': 0,
+                #             'counter': 0}
+                # self.foragerbees={'position':{'x':np.zeros(self.nodes),'y':np.zeros(self.nodes)},
+                #             'cost':np.inf,
+                #             #'sol': 0,
+                #             'size': np.zeros(2),
+                #             'stagnated': 0,
+                #             'counter': 0}
+                # self.assignment=self.d_tri_real_array(0,1,1,1,self.recruitment[i])[0]
+                arr=np.linspace(0,1,self.n)
+                
+                self.assignment=np.zeros(int(self.recruitment[i]))
+                for mm in range(int(self.recruitment[i])):
+                    numb=np.random.randint(0,self.n)
+                    self.assignment[mm]=arr[numb]
+
                 # print(self.assignment)
 
                 for j in range(int(self.recruitment[i])):
@@ -116,19 +144,21 @@ class bees_algo:
                     if self.foragerbees['cost']<self.bestnewbee['cost']:
                         self.bestnewbee=self.foragerbees
                     
-                if self.bestnewbee['cost']<self.patch[i]['cost']:
-                    self.patch[i]=self.bestnewbee
-                    self.patch[i]['stagnated']=0
-                else:
-                    self.patch[i]['stagnated']+=1
-                    self.patch[i]['size']=self.patch[i]['size']*self.shrink
+                    if self.bestnewbee['cost']<self.patch[i]['cost']:
+                        self.patch[i]=self.bestnewbee
+                        self.patch[i]['stagnated']=0
+                    else:
+                        self.patch[i]['stagnated']+=1
+                        self.patch[i]['size']=self.patch[i]['size']*self.shrink
 
-                if self.patch[i]['stagnated']>self.stlim:
-                    self.patch[i]['size']=np.array([((self.m.xmax-self.m.xmin)/4.00),((self.m.ymax-self.m.ymin)/4.00)])
-                    self.patch[i]['stagnated']=0
-                    self.P*=-1
+                    if self.patch[i]['stagnated']>self.stlim:
+                        al=self.n-1
+                        self.patch[i]=self.patch[al]
+                        self.patch[i]['size']=np.array([((self.m.xmax-self.m.xmin)/4.00),((self.m.ymax-self.m.ymin)/4.00)])
+                        self.patch[i]['stagnated']=0
+                        self.P*=-1
 
-            self.patch=self.site_selection(self.patch)
+                self.patch=self.site_selection(self.patch)
             # if it==0:
 
             #     self.optsol=self.patch[0]
@@ -138,12 +168,13 @@ class bees_algo:
             if tmp<best:
                 best=tmp 
                 self.optsol=self.patch[0]
-            opt_cost[it]=tmp 
+            # opt_cost[it]=tmp 
             # opt_cost=np.zeros(self.max_it+1)
             # opt_cost[0]=np.inf 
             # opt_cost[it+1]=self.optcost[it]
             # self.counter_sup[it]=self.counter
-            print(tmp)
+            print(best)
+            print("Iteration=",it+1)
             # f1=open("savex.txt","a")
             # f1.write(str(self.optsol['position']['x'])+'\n')
             # f1.close()
@@ -154,7 +185,8 @@ class bees_algo:
             # f3.write(str(best)+'\n')
             # f3.close()
             it+=1
-        return self.optsol,opt_cost 
+        st.legacy_caching.clear_cache()
+        return self.optsol,opt_cost,best
             
             
             
@@ -204,7 +236,7 @@ class bees_algo:
 
     def integrated_foraging_stlim_all(self,x,ass,vmx,vmn,size):
         
-        r=ass*size 
+        r=ass*size
         # print(r)
         nvar=x.size 
         pert=np.random.randint(0,2,(1,nvar))
@@ -222,7 +254,7 @@ class bees_algo:
         return y 
     
     def integrated_foraging_stlim(self,x,ass,vmx,vmn,size):
-        r=ass*size 
+        r=ass*size
         nvar=x.size 
         k=np.random.randint(0,nvar)
         y=x 
