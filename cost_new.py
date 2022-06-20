@@ -11,8 +11,8 @@ class cost:
         self.alpha=1
         
     def get_cost(self,sol1):
-        self.x=sol1['x']
-        self.y=sol1['y'] 
+        self.x=sol1[0:10]
+        self.y=sol1[10:20] 
         self.k=self.x.size + 2
         self.TS=np.linspace(0,1,self.k)
         self.XS=np.insert(self.x,0,self.m.xs)
@@ -63,7 +63,7 @@ class cost:
         # self.z=self.L*self.violation 
         # print(self.z)
         # self.z=np.random.randint(0,100)
-        return self.z, self.feasible
+        return self.z
         
 
             

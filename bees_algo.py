@@ -13,13 +13,13 @@ class bees_algo:
         self.m=model()
         self.cost=cost()
         self.max_eval=500000
-        self.n=7
+        self.n=10
         self.nep=10
         self.shrink=0.8
         self.stlim=5
         self.accuracy=0.001
         self.P=1
-        self.max_it=50
+        self.max_it=1000
         self.optcost=np.zeros(self.max_it)
         self.counter_sup=np.zeros(self.max_it)
         # np.random.seed(200000)
@@ -96,7 +96,7 @@ class bees_algo:
                             'size': np.zeros(2),
                             'stagnated': 0,
                             'counter': 0}
-        while(True):
+        while(it<self.max_it):
             # np.random.seed(it)
 
             # if self.counter>=self.max_eval:
@@ -118,13 +118,13 @@ class bees_algo:
                 #             'size': np.zeros(2),
                 #             'stagnated': 0,
                 #             'counter': 0}
-                # self.assignment=self.d_tri_real_array(0,1,1,1,self.recruitment[i])[0]
-                arr=np.linspace(0,1,self.n)
+                self.assignment=self.d_tri_real_array(0,1,1,1,self.recruitment[i])[0]
+                # arr=np.linspace(0,1,self.n)
                 
-                self.assignment=np.zeros(int(self.recruitment[i]))
-                for mm in range(int(self.recruitment[i])):
-                    numb=np.random.randint(0,self.n)
-                    self.assignment[mm]=arr[numb]
+                # self.assignment=np.zeros(int(self.recruitment[i]))
+                # for mm in range(int(self.recruitment[i])):
+                #     numb=np.random.randint(0,self.n)
+                #     self.assignment[mm]=arr[numb]
 
                 # print(self.assignment)
 
@@ -144,21 +144,24 @@ class bees_algo:
                     if self.foragerbees['cost']<self.bestnewbee['cost']:
                         self.bestnewbee=self.foragerbees
                     
-                    if self.bestnewbee['cost']<self.patch[i]['cost']:
-                        self.patch[i]=self.bestnewbee
-                        self.patch[i]['stagnated']=0
-                    else:
-                        self.patch[i]['stagnated']+=1
-                        self.patch[i]['size']=self.patch[i]['size']*self.shrink
+                if self.bestnewbee['cost']<self.patch[i]['cost']:
+                    self.patch[i]=self.bestnewbee
+                    self.patch[i]['stagnated']=0
+                else:
+                    self.patch[i]['stagnated']+=1
+                    self.patch[i]['size']=self.patch[i]['size']*self.shrink
 
-                    if self.patch[i]['stagnated']>self.stlim:
-                        al=self.n-1
-                        self.patch[i]=self.patch[al]
-                        self.patch[i]['size']=np.array([((self.m.xmax-self.m.xmin)/4.00),((self.m.ymax-self.m.ymin)/4.00)])
-                        self.patch[i]['stagnated']=0
-                        self.P*=-1
+                if self.patch[i]['stagnated']>self.stlim:
+                    al=self.n-1
+                    self.patch[i]=self.patch[al]
+                    # self.patch[i]['position']['x']=np.random.uniform(self.m.xmin,self.m.xmax,self.nodes)
+                    # self.patch[i]['position']['y']=np.random.uniform(self.m.ymin,self.m.ymax,self.nodes)
+                    self.patch[i]['size']=np.array([((self.m.xmax-self.m.xmin)/4.00),((self.m.ymax-self.m.ymin)/4.00)])
+                    self.patch[i]['stagnated']=0
+                    self.P*=-1
+                    # self.n=self.n-1
 
-                self.patch=self.site_selection(self.patch)
+            self.patch=self.site_selection(self.patch)
             # if it==0:
 
             #     self.optsol=self.patch[0]
@@ -168,7 +171,7 @@ class bees_algo:
             if tmp<best:
                 best=tmp 
                 self.optsol=self.patch[0]
-            # opt_cost[it]=tmp 
+            opt_cost[it]=best 
             # opt_cost=np.zeros(self.max_it+1)
             # opt_cost[0]=np.inf 
             # opt_cost[it+1]=self.optcost[it]
@@ -207,29 +210,29 @@ class bees_algo:
 
     def d_tri_real(self,k,t,b):
         m=np.random.randint(1,11)
-        a=(t-k)/10
-        b=(b-t)/10
+        a=(t-k)/10.00 
+        b1=(b-t)/10.00
 
         if m==1:
-            angka=np.random.uniform((t-a),(t+b),1)
+            angka=np.random.uniform((t-a),(t+b1),1)
         elif m==2:
-            angka=np.random.uniform((t-2*a),(t+2*b),1)
+            angka=np.random.uniform((t-2*a),(t+2*b1),1)
         elif m==3:
-            angka=np.random.uniform((t-3*a),(t+3*b),1)
+            angka=np.random.uniform((t-3*a),(t+3*b1),1)
         elif m==4:
-            angka=np.random.uniform((t-4*a),(t+4*b),1)
+            angka=np.random.uniform((t-4*a),(t+4*b1),1)
         elif m==5:
-            angka=np.random.uniform((t-5*a),(t+5*b),1)
+            angka=np.random.uniform((t-5*a),(t+5*b1),1)
         elif m==6:
-            angka=np.random.uniform((t-6*a),(t+6*b),1)
+            angka=np.random.uniform((t-6*a),(t+6*b1),1)
         elif m==7:
-            angka=np.random.uniform((t-7*a),(t+7*b),1)
+            angka=np.random.uniform((t-7*a),(t+7*b1),1)
         elif m==8:
-            angka=np.random.uniform((t-8*a),(t+8*b),1)
+            angka=np.random.uniform((t-8*a),(t+8*b1),1)
         elif m==9:
-            angka=np.random.uniform((t-9*a),(t+9*b),1)
+            angka=np.random.uniform((t-9*a),(t+9*b1),1)
         elif m==10:
-            angka=np.random.uniform((t-10*a),(t+10*b),1)
+            angka=np.random.uniform((t-10*a),(t+10*b1),1)
         
         return angka 
 
