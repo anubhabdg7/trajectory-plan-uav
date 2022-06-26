@@ -1,12 +1,7 @@
-# trajectory-plan-uav
-Using the two-parameter version of the Bees Algorithm to find the optimal trajectory for a single UAV in 2D, in the presence of obstacles
+# Trajectory-Plan
 
+This is the code of Bees Algorithm (BA) for UAV's Trajectory Plan
 
-To run the old code converted from MATLAB- do 
+The BA used bi-parameter to solve the problem
 
-python3 main.py
-
-
-To run the newly integrated code from Github- do 
-
-python3 main_new.py 
+The parameter reduction inspired by bees' behaviour of foraging which exploring while exploitating.
