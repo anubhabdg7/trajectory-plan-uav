@@ -69,7 +69,7 @@ yy=interpolate.splev(tt,ypts)
 
 # axes.plot(sol['position']['x'],sol['position']['y'])
 
-axes.plot(xx,yy,color='orange')
+axes.scatter(XS,YS,color='orange')
 
 # print("Best=",best)
 

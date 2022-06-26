@@ -13,13 +13,13 @@ class bees_algo:
         self.m=model()
         self.cost=cost()
         self.max_eval=500000
-        self.n=10
+        self.n=7
         self.nep=10
         self.shrink=0.8
         self.stlim=5
         self.accuracy=0.001
         self.P=1
-        self.max_it=1000
+        self.max_it=130000
         self.optcost=np.zeros(self.max_it)
         self.counter_sup=np.zeros(self.max_it)
         # np.random.seed(200000)
@@ -69,7 +69,7 @@ class bees_algo:
         # self.size=np.linspace(0,1,self.n)
         # for i in range(self.n):
         #     print(self.patch[i]['cost'])
-        self.patch=self.site_selection(self.patch)
+        self.patch=(self.site_selection(self.patch)).copy()
         # for i in range(self.n):
         #     print(self.patch[i]['cost'])
 
@@ -118,7 +118,9 @@ class bees_algo:
                 #             'size': np.zeros(2),
                 #             'stagnated': 0,
                 #             'counter': 0}
-                self.assignment=self.d_tri_real_array(0,1,1,1,self.recruitment[i])[0]
+                avar=(i)*(1.00/(float(self.n-1)))
+                # print(avar)
+                self.assignment=self.d_tri_real_array(0,avar,1,1,self.recruitment[i])[0]
                 # arr=np.linspace(0,1,self.n)
                 
                 # self.assignment=np.zeros(int(self.recruitment[i]))
@@ -142,18 +144,19 @@ class bees_algo:
                     self.counter+=1
                     self.foragerbees['counter']=self.counter
                     if self.foragerbees['cost']<self.bestnewbee['cost']:
-                        self.bestnewbee=self.foragerbees
+                        self.bestnewbee=self.foragerbees.copy() 
                     
                 if self.bestnewbee['cost']<self.patch[i]['cost']:
-                    self.patch[i]=self.bestnewbee
+                    self.patch[i]=self.bestnewbee.copy()
                     self.patch[i]['stagnated']=0
                 else:
                     self.patch[i]['stagnated']+=1
                     self.patch[i]['size']=self.patch[i]['size']*self.shrink
 
                 if self.patch[i]['stagnated']>self.stlim:
+                    # print("I'm here")
                     al=self.n-1
-                    self.patch[i]=self.patch[al]
+                    self.patch[i]=(self.patch[al]).copy()
                     # self.patch[i]['position']['x']=np.random.uniform(self.m.xmin,self.m.xmax,self.nodes)
                     # self.patch[i]['position']['y']=np.random.uniform(self.m.ymin,self.m.ymax,self.nodes)
                     self.patch[i]['size']=np.array([((self.m.xmax-self.m.xmin)/4.00),((self.m.ymax-self.m.ymin)/4.00)])
@@ -161,7 +164,7 @@ class bees_algo:
                     self.P*=-1
                     # self.n=self.n-1
 
-            self.patch=self.site_selection(self.patch)
+            self.patch=(self.site_selection(self.patch)).copy()
             # if it==0:
 
             #     self.optsol=self.patch[0]
@@ -170,8 +173,8 @@ class bees_algo:
             tmp=self.patch[0]['cost']
             if tmp<best:
                 best=tmp 
-                self.optsol=self.patch[0]
-            opt_cost[it]=best 
+                self.optsol=self.patch[0].copy()
+            opt_cost[it]=best  
             # opt_cost=np.zeros(self.max_it+1)
             # opt_cost[0]=np.inf 
             # opt_cost[it+1]=self.optcost[it]
@@ -210,6 +213,7 @@ class bees_algo:
 
     def d_tri_real(self,k,t,b):
         m=np.random.randint(1,11)
+        
         a=(t-k)/10.00 
         b1=(b-t)/10.00
 
