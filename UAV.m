@@ -93,6 +93,18 @@ classdef UAV
                     xmax= 100;
                     ymin=0;
                     ymax= 100;
+                    obj.xs = xs;
+                    obj.ys = ys;
+                    obj.xt = xt;
+                    obj.yt= yt;
+                    obj.xobs = xobs ;
+                    obj.yobs = yobs ;
+                    obj.robs = robs ;
+                    obj.tobs = tobs ;
+                    obj.xmin=xmin;
+                    obj.xmax=xmax;
+                    obj.ymin=ymin;
+                    obj.ymax=ymax;
               otherwise,
                 disp('fitness function not defined');
              end
