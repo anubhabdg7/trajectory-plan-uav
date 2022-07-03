@@ -11,6 +11,7 @@ class model:
         self.xobs=np.array([45,12,32,36,55])
         self.yobs=np.array([52,40,68,26,80])
         self.robs=np.array([10,10,8,12,9])
+        self.tobs=np.array([2,10,1,2,3])
         self.xmin=0
         self.xmax=100
         self.ymin=0

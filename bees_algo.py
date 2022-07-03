@@ -13,13 +13,13 @@ class bees_algo:
         self.m=model()
         self.cost=cost()
         self.max_eval=500000
-        self.n=7
+        self.n=30
         self.nep=10
         self.shrink=0.8
         self.stlim=5
         self.accuracy=0.001
         self.P=1
-        self.max_it=130000
+        self.max_it=200
         self.optcost=np.zeros(self.max_it)
         self.counter_sup=np.zeros(self.max_it)
         # np.random.seed(200000)
@@ -191,7 +191,7 @@ class bees_algo:
             # f3.write(str(best)+'\n')
             # f3.close()
             it+=1
-        st.legacy_caching.clear_cache()
+        # st.legacy_caching.clear_cache()
         return self.optsol,opt_cost,best
             
             

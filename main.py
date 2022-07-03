@@ -76,7 +76,7 @@ plt.show()
 
 plt.plot(cost)
 plt.show()
-st.legacy_caching.clear_cache()
+# st.legacy_caching.clear_cache()
 
 
 
